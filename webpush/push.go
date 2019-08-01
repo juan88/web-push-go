@@ -28,6 +28,8 @@ const (
 	tempGcmURL = "https://gcm-http.googleapis.com/gcm"
 )
 
+var TTL string = "86400"
+
 // NewPushRequest creates a valid Web Push HTTP request for sending a message
 // to a subscriber. If the push service requires an authentication header
 // (notably Google Cloud Messaging, used by Chrome) then you can add that as the
@@ -44,7 +46,7 @@ func NewPushRequest(sub *Subscription, message string, token string) (*http.Requ
 	}
 
 	// TODO: Make the TTL variable
-	req.Header.Add("TTL", "0")
+	req.Header.Add("TTL", TTL)
 
 	if token != "" {
 		req.Header.Add("Authorization", fmt.Sprintf(`key=%s`, token))
