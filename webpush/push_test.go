@@ -72,7 +72,7 @@ func TestSendWebPush(t *testing.T) {
 	sub := &Subscription{ts.URL, key, auth}
 	message := "I am the walrus"
 
-	if _, err = Send(nil, sub, message, ""); err != nil {
+	if _, err = Send(nil, sub, message, "", ""); err != nil {
 		t.Error(err)
 	}
 }
@@ -101,7 +101,7 @@ func TestSendTickle(t *testing.T) {
 
 	sub := &Subscription{Endpoint: ts.URL}
 
-	if _, err := Send(nil, sub, "", ""); err != nil {
+	if _, err := Send(nil, sub, "", "", "0"); err != nil {
 		t.Error(err)
 	}
 }
