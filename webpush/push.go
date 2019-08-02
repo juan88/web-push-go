@@ -24,17 +24,16 @@ import (
 )
 
 const (
-	gcmURL     = "https://android.googleapis.com/gcm/send"
-	tempGcmURL = "https://gcm-http.googleapis.com/gcm"
+	gcmURL            = "https://android.googleapis.com/gcm/send"
+	tempGcmURL        = "https://gcm-http.googleapis.com/gcm"
+	DefaultTTL string = "86400"
 )
-
-var TTL string = "86400"
 
 // NewPushRequest creates a valid Web Push HTTP request for sending a message
 // to a subscriber. If the push service requires an authentication header
 // (notably Google Cloud Messaging, used by Chrome) then you can add that as the
 // token parameter.
-func NewPushRequest(sub *Subscription, message string, token string) (*http.Request, error) {
+func NewPushRequest(sub *Subscription, message string, token string, timeToLive string) (*http.Request, error) {
 	// If the endpoint is GCM then we temporarily need to rewrite it, as not all
 	// GCM servers support the Web Push protocol. This should go away in the
 	// future.
@@ -45,8 +44,11 @@ func NewPushRequest(sub *Subscription, message string, token string) (*http.Requ
 		return nil, err
 	}
 
+	if timeToLive == "" {
+		timeToLive = DefaultTTL
+	}
 	// TODO: Make the TTL variable
-	req.Header.Add("TTL", TTL)
+	req.Header.Add("TTL", timeToLive)
 
 	if token != "" {
 		req.Header.Add("Authorization", fmt.Sprintf(`key=%s`, token))
@@ -76,12 +78,12 @@ func NewPushRequest(sub *Subscription, message string, token string) (*http.Requ
 // will be used. If the push service requires an authentication header (notably
 // Google Cloud Messaging, used by Chrome) then you can add that as the token
 // parameter.
-func Send(client *http.Client, sub *Subscription, message, token string) (*http.Response, error) {
+func Send(client *http.Client, sub *Subscription, message, token, timeToLive string) (*http.Response, error) {
 	if client == nil {
 		client = http.DefaultClient
 	}
 
-	req, err := NewPushRequest(sub, message, token)
+	req, err := NewPushRequest(sub, message, token, timeToLive)
 	if err != nil {
 		return nil, err
 	}
